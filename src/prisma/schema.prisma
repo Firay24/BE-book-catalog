@@ -11,14 +11,16 @@ generator client {
 }
 
 model User {
-  Id        String   @id
-  Email     String   @unique
-  Password  String
-  Name      String
-  RoleId    String
-  CreatedAt DateTime @default(now())
-  UpdatedAt DateTime @updatedAt
-  Role      Role     @relation(fields: [RoleId], references: [Id], onDelete: Restrict)
+  Id            String          @id
+  Email         String          @unique
+  Password      String
+  Name          String
+  RoleId        String
+  BanUntil      DateTime?       @db.Date
+  CreatedAt     DateTime        @default(now())
+  UpdatedAt     DateTime        @updatedAt
+  Role          Role            @relation(fields: [RoleId], references: [Id], onDelete: Restrict)
+  BorrowRequest BorrowRequest[]
 }
 
 model Role {
@@ -43,17 +45,55 @@ enum Thickness {
   THICK
 }
 
+enum StatusBook {
+  AVAILABLE
+  BORROWED
+}
+
 model Book {
-  Id          String    @id
-  Title       String
-  Description String
-  ImageUrl    String
-  ReleaseYear Int
-  Price       Int
-  TotalPage   Int
-  Thickness   Thickness
-  CategoryId  String
-  CreatedAt   DateTime  @default(now())
-  UpdatedAt   DateTime  @updatedAt
-  Category    Category  @relation(fields: [CategoryId], references: [Id], onDelete: Restrict)
+  Id            String          @id
+  Title         String
+  Description   String
+  ImageUrl      String
+  ReleaseYear   Int
+  Price         Int
+  TotalPage     Int
+  Thickness     Thickness
+  CategoryId    String
+  Status        StatusBook      @default(AVAILABLE)
+  CreatedAt     DateTime        @default(now())
+  UpdatedAt     DateTime        @updatedAt
+  Category      Category        @relation(fields: [CategoryId], references: [Id], onDelete: Restrict)
+  BorrowRequest BorrowRequest[]
+  BorrowedBook  BorrowedBook[]
+}
+
+model BorrowRequest {
+  Id           String         @id
+  UserId       String
+  BookId       String
+  Status       RequestStatus
+  Days         Int
+  RequestDate  DateTime       @default(now())
+  Approved     DateTime?      @db.Date
+  User         User           @relation(fields: [UserId], references: [Id])
+  Book         Book           @relation(fields: [BookId], references: [Id])
+  BorrowedBook BorrowedBook[]
+}
+
+enum RequestStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+}
+
+model BorrowedBook {
+  Id              String        @id
+  BorrowRequestId String
+  StartDate       DateTime
+  EndDate         DateTime
+  BookId          String
+  ReturnedDate    DateTime?
+  BorrowRequest   BorrowRequest @relation(fields: [BorrowRequestId], references: [Id])
+  Book            Book          @relation(fields: [BookId], references: [Id])
 }
