@@ -36,8 +36,8 @@ async function main() {
   });
 
   const categories = [
-    { id: 'PP6QZJ989Q7HL60Z92HM', name: 'Horror' },
-    { id: 'C9N7LSOD75V8HF8G7CQJ', name: 'Comedy' },
+    { id: 'PP6QZJ989Q7HL60Z92HM', name: 'horror' },
+    { id: 'C9N7LSOD75V8HF8G7CQJ', name: 'comedy' },
   ];
   await prisma.category.createMany({
     data: categories.map(category => ({
