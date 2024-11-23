@@ -1,6 +1,6 @@
 import { PrismaClient, User } from '@prisma/client';
 import { compare, hash } from 'bcrypt';
-import { sign } from 'jsonwebtoken';
+import { sign, verify } from 'jsonwebtoken';
 import { Service } from 'typedi';
 import { SECRET_KEY } from '@config';
 import { CreateUserDto, LoginUserDto } from '@dtos/users.dto';
@@ -31,7 +31,6 @@ export class AuthService {
     const userDataResponse: UserResponse = {
       id: createUserData.Id,
       email: createUserData.Email,
-      password: createUserData.Password,
       name: createUserData.Name,
       roleId: createUserData.RoleId,
     };
@@ -52,12 +51,34 @@ export class AuthService {
     const userDataResponse: UserResponse = {
       id: findUser.Id,
       email: findUser.Email,
-      password: findUser.Password,
       name: findUser.Name,
       roleId: findUser.RoleId,
     };
 
     return { cookie, findUser: userDataResponse };
+  }
+
+  public async getCurrentUser(token: string): Promise<UserResponse> {
+    try {
+      // Verifikasi token
+      const { id } = verify(token, SECRET_KEY) as DataStoredInToken;
+
+      // Cari user berdasarkan ID dari token
+      const findUser: User = await this.users.findUnique({ where: { Id: id } });
+      if (!findUser) throw new HttpException(404, 'User not found');
+
+      // Buat response user
+      const userDataResponse: UserResponse = {
+        id: findUser.Id,
+        email: findUser.Email,
+        name: findUser.Name,
+        roleId: findUser.RoleId,
+      };
+
+      return userDataResponse;
+    } catch (error) {
+      throw new HttpException(401, 'Invalid or expired token');
+    }
   }
 
   public async logout(userData: LoginUserDto): Promise<UserResponse> {
@@ -67,7 +88,6 @@ export class AuthService {
     const userDataResponse: UserResponse = {
       id: findUser.Id,
       email: findUser.Email,
-      password: findUser.Password,
       name: findUser.Name,
       roleId: findUser.RoleId,
     };

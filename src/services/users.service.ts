@@ -16,7 +16,6 @@ export class UserService {
       return {
         id: user.Id,
         email: user.Email,
-        password: user.Password,
         name: user.Name,
         roleId: user.RoleId,
       };
@@ -31,7 +30,6 @@ export class UserService {
     const userData: UserResponse = {
       id: findUser.Id,
       email: findUser.Email,
-      password: findUser.Password,
       name: findUser.Name,
       roleId: findUser.RoleId,
     };
@@ -56,7 +54,6 @@ export class UserService {
     const userDataResponse: UserResponse = {
       id: createUserData.Id,
       email: createUserData.Email,
-      password: createUserData.Password,
       name: createUserData.Name,
       roleId: createUserData.RoleId,
     };
@@ -73,7 +70,6 @@ export class UserService {
     const userDataResponse: UserResponse = {
       id: updateUserData.Id,
       email: updateUserData.Email,
-      password: updateUserData.Password,
       name: updateUserData.Name,
       roleId: updateUserData.RoleId,
     };
@@ -89,7 +85,6 @@ export class UserService {
     const userDataResponse: UserResponse = {
       id: deleteUserData.Id,
       email: deleteUserData.Email,
-      password: deleteUserData.Password,
       name: deleteUserData.Name,
       roleId: deleteUserData.RoleId,
     };

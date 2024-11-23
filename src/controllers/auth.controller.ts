@@ -4,6 +4,7 @@ import { RequestWithUser } from '@interfaces/auth.interface';
 import { UserResponse } from '@interfaces/users.interface';
 import { AuthService } from '@services/auth.service';
 import { CreateUserDto, LoginUserDto } from '@/dtos/users.dto';
+import { HttpException } from '@/exceptions/httpException';
 
 export class AuthController {
   public auth = Container.get(AuthService);
@@ -26,6 +27,18 @@ export class AuthController {
 
       res.setHeader('Set-Cookie', [cookie]);
       res.status(200).json({ data: findUser, message: 'login' });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  public getCurrentUser = async (req: RequestWithUser, res: Response, next: NextFunction) => {
+    try {
+      const token = req.cookies.Authorization || req.header('Authorization')?.split('Bearer ')[1];
+      if (!token) throw new HttpException(401, 'Authentication token missing');
+
+      const user = await this.auth.getCurrentUser(token);
+      res.status(200).json({ data: user, message: 'current user' });
     } catch (error) {
       next(error);
     }

@@ -1,7 +1,7 @@
 export interface UserResponse {
   id: string;
   email: string;
-  password: string;
+  password?: string;
   name: string;
   roleId: string;
 }
@@ -11,4 +11,5 @@ export interface UserAuth {
   email: string;
   name: string;
   roleId: string;
+  role?: string;
 }

@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsString, Max, Min } from 'class-validator';
 
 export class UpdateBooksDto {
   @IsString()
@@ -14,6 +14,8 @@ export class UpdateBooksDto {
 
   @IsNumber()
   @IsNotEmpty()
+  @Min(1980, { message: 'ReleaseYear must be at least 1980' })
+  @Max(2021, { message: 'ReleaseYear must not exceed 2021' })
   public ReleaseYear: number;
 
   @IsNumber()
