@@ -25,3 +25,13 @@ export class UpdateUserDto {
   @MaxLength(32)
   public password: string;
 }
+
+export class LoginUserDto {
+  @IsEmail()
+  public Email: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @MaxLength(32)
+  public Password: string;
+}
