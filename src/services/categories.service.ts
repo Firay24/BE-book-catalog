@@ -62,7 +62,7 @@ export class CategoryService {
     return categoryDataResponse;
   }
 
-  public async deletecategory(categoryId: string): Promise<CategoryResponse> {
+  public async deleteCategory(categoryId: string): Promise<CategoryResponse> {
     const findCategory: Category = await this.category.findUnique({ where: { Id: categoryId } });
     if (!findCategory) throw new HttpException(409, "Category doesn't exist");
 

@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, Thickness } from '@prisma/client';
 import bcrypt from 'bcrypt';
 
 const prisma = new PrismaClient();
@@ -56,7 +56,7 @@ async function main() {
       releaseYear: 2020,
       price: 50000,
       totalPage: 200,
-      thickness: 'tebal',
+      thickness: 'THICK',
       categoryId: 'PP6QZJ989Q7HL60Z92HM',
     },
     {
@@ -68,7 +68,7 @@ async function main() {
       releaseYear: 2020,
       price: 120000,
       totalPage: 200,
-      thickness: 'tebal',
+      thickness: 'THICK',
       categoryId: 'C9N7LSOD75V8HF8G7CQJ',
     },
   ];
@@ -81,7 +81,7 @@ async function main() {
       ReleaseYear: book.releaseYear,
       Price: book.price,
       TotalPage: book.totalPage,
-      Thickness: book.thickness,
+      Thickness: book.thickness as Thickness,
       CategoryId: book.categoryId,
     })),
   });

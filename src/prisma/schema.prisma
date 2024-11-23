@@ -37,17 +37,23 @@ model Category {
   Book      Book[]
 }
 
+enum Thickness {
+  THIN
+  NORMAL
+  THICK
+}
+
 model Book {
-  Id          String   @id
+  Id          String    @id
   Title       String
   Description String
   ImageUrl    String
   ReleaseYear Int
   Price       Int
   TotalPage   Int
-  Thickness   String
+  Thickness   Thickness
   CategoryId  String
-  CreatedAt   DateTime @default(now())
-  UpdatedAt   DateTime @updatedAt
-  Category    Category @relation(fields: [CategoryId], references: [Id], onDelete: Restrict)
+  CreatedAt   DateTime  @default(now())
+  UpdatedAt   DateTime  @updatedAt
+  Category    Category  @relation(fields: [CategoryId], references: [Id], onDelete: Restrict)
 }
