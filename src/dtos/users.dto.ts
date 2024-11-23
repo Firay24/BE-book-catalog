@@ -2,13 +2,20 @@ import { IsEmail, IsString, IsNotEmpty, MinLength, MaxLength } from 'class-valid
 
 export class CreateUserDto {
   @IsEmail()
-  public email: string;
+  public Email: string;
 
   @IsString()
   @IsNotEmpty()
-  @MinLength(9)
   @MaxLength(32)
-  public password: string;
+  public Password: string;
+
+  @IsString()
+  @IsNotEmpty()
+  public Name: string;
+
+  @IsString()
+  @IsNotEmpty()
+  public RoleId: string;
 }
 
 export class UpdateUserDto {
