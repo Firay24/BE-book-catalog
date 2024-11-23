@@ -13,13 +13,15 @@
     "lint": "eslint --ignore-path .gitignore --ext .ts src/",
     "lint:fix": "npm run lint -- --fix",
     "prisma:init": "prisma init",
-    "prisma:migrate": "prisma migrate dev --preview-feature",
+    "prisma:migrate": "dotenv -e .env.development.local prisma migrate dev",
     "prisma:generate": "prisma generate",
+    "prisma:seed": "dotenv -e .env.development.local ts-node src/prisma/seed.ts",
     "deploy:prod": "npm run build && pm2 start ecosystem.config.js --only prod",
     "deploy:dev": "pm2 start ecosystem.config.js --only dev"
   },
   "prisma": {
-    "schema": "src/prisma/schema.prisma"
+    "schema": "src/prisma/schema.prisma",
+    "seed": "ts-node src/prisma/seed.ts"
   },
   "dependencies": {
     "@prisma/client": "^4.1.0",
@@ -40,6 +42,7 @@
     "swagger-jsdoc": "^6.2.1",
     "swagger-ui-express": "^4.5.0",
     "typedi": "^0.10.0",
+    "uuid": "^11.0.3",
     "winston": "^3.8.1",
     "winston-daily-rotate-file": "^4.7.1"
   },
@@ -62,6 +65,7 @@
     "@typescript-eslint/eslint-plugin": "^5.29.0",
     "@typescript-eslint/parser": "^5.29.0",
     "cross-env": "^7.0.3",
+    "dotenv-cli": "^7.4.4",
     "eslint": "^8.20.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-prettier": "^4.2.1",

@@ -2,7 +2,7 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 datasource db {
-  provider = "mysql"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -11,7 +11,43 @@ generator client {
 }
 
 model User {
-  id       Int    @id @default(autoincrement())
-  email    String @unique
-  password String
+  Id        String   @id
+  Email     String   @unique
+  Password  String
+  Name      String
+  RoleId    String
+  CreatedAt DateTime @default(now())
+  UpdatedAt DateTime @updatedAt
+  Role      Role     @relation(fields: [RoleId], references: [Id], onDelete: Restrict)
+}
+
+model Role {
+  Id        String   @id
+  Name      String
+  CreatedAt DateTime @default(now())
+  UpdatedAt DateTime @updatedAt
+  User      User[]
+}
+
+model Category {
+  Id        String   @id
+  Name      String
+  CreatedAt DateTime @default(now())
+  UpdatedAt DateTime @updatedAt
+  Book      Book[]
+}
+
+model Book {
+  Id          String   @id
+  Title       String
+  Description String
+  ImageUrl    String
+  ReleaseYear Int
+  Price       Int
+  TotalPage   Int
+  Thickness   String
+  CategoryId  String
+  CreatedAt   DateTime @default(now())
+  UpdatedAt   DateTime @updatedAt
+  Category    Category @relation(fields: [CategoryId], references: [Id], onDelete: Restrict)
 }
