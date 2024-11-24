@@ -1,4 +1,4 @@
-import { PrismaClient, BorrowRequest, RequestStatus, StatusBook } from '@prisma/client';
+import { PrismaClient, BorrowRequest, RequestStatus, StatusBook, User } from '@prisma/client';
 import { Service } from 'typedi';
 import { generateId } from '@/utils/generateId';
 import { BorrowRequestDto, UpdateBorrowRequestDto } from '@/dtos/borrowRequest.dto';
@@ -10,8 +10,14 @@ export class BorrowRequestService {
   public request = new PrismaClient().borrowRequest;
   public borrow = new PrismaClient().borrowedBook;
   public book = new PrismaClient().book;
+  public user = new PrismaClient().user;
 
   public async createBorrowRequest(borrowRequestData: BorrowRequestDto): Promise<BorrowResponse> {
+    const findUser: User = await this.user.findUnique({ where: { Id: borrowRequestData.UserId } });
+    if (!findUser) throw new HttpException(409, "User doesn't exist");
+
+    if (findUser.BanUntil > new Date()) throw new HttpException(409, 'User is banned');
+
     const createBorrowRequestData: BorrowRequest = await this.request.create({
       data: {
         Id: generateId(),
