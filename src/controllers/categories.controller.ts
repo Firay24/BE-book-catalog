@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import { Container } from 'typedi';
 import { CategoryService } from '@/services/categories.service';
-import { CategoryResponse } from '@/interfaces/categories.interface';
+import { BookByCategoryResponse, CategoryResponse } from '@/interfaces/categories.interface';
 import { UpdateCategoryDto } from '@/dtos/categories.dto';
 
 export class CategoryController {
@@ -23,6 +23,17 @@ export class CategoryController {
       const findOneCategoryData: CategoryResponse = await this.category.findCategoryById(categoryId);
 
       res.status(200).json({ data: findOneCategoryData, message: 'findOne' });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  public bookByCategoryId = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const categoryId = String(req.params.id);
+      const findBookByCategoryData: BookByCategoryResponse = await this.category.bookByCategoryId(categoryId);
+
+      res.status(200).json({ data: findBookByCategoryData, message: 'find books by category' });
     } catch (error) {
       next(error);
     }

@@ -18,6 +18,7 @@ export class CategoryRoute implements Routes {
   private initializeRoutes() {
     this.router.get(`${this.path}`, AuthMiddleware([Role.ADMIN, Role.MEMBER]), this.category.getCategories);
     this.router.get(`${this.path}/:id([A-Za-z0-9]+)`, AuthMiddleware([Role.ADMIN, Role.MEMBER]), this.category.getCategoryById);
+    this.router.get(`${this.path}/:id([A-Za-z0-9]+)/books`, AuthMiddleware([Role.ADMIN, Role.MEMBER]), this.category.bookByCategoryId);
     this.router.post(`${this.path}`, AuthMiddleware([Role.ADMIN]), ValidationMiddleware(UpdateCategoryDto), this.category.createCategory);
     this.router.put(
       `${this.path}/:id([A-Za-z0-9]+)`,

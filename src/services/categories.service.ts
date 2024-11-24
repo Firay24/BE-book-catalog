@@ -3,7 +3,7 @@ import { Service } from 'typedi';
 import { UpdateCategoryDto } from '@/dtos/categories.dto';
 import { HttpException } from '@/exceptions/httpException';
 import { generateId } from '@/utils/generateId';
-import { CategoryResponse } from '@/interfaces/categories.interface';
+import { CategoryResponse, BookByCategoryResponse, BookByCategoryDb } from '@/interfaces/categories.interface';
 
 @Service()
 export class CategoryService {
@@ -29,6 +29,31 @@ export class CategoryService {
       name: findCategory.Name,
     };
     return userData;
+  }
+
+  public async bookByCategoryId(categoryId: string): Promise<BookByCategoryResponse> {
+    const findCategory: BookByCategoryDb = await this.category.findUnique({ where: { Id: categoryId }, include: { Book: true } });
+    if (!findCategory) throw new HttpException(409, "Category doesn't exist");
+
+    const bookByCategoryResponse: BookByCategoryResponse = {
+      id: findCategory.Id,
+      category: findCategory.Name,
+      book: findCategory.Book.map(book => {
+        return {
+          id: book.Id,
+          title: book.Title,
+          description: book.Description,
+          imageUrl: book.ImageUrl,
+          releaseYear: book.ReleaseYear,
+          price: book.Price,
+          totalPage: book.TotalPage,
+          thickness: book.Thickness,
+          categoryId: book.CategoryId,
+        };
+      }),
+    };
+
+    return bookByCategoryResponse;
   }
 
   public async createCategory(categoryData: UpdateCategoryDto): Promise<CategoryResponse> {
