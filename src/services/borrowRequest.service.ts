@@ -2,7 +2,7 @@ import { PrismaClient, BorrowRequest, RequestStatus, StatusBook, User, Book } fr
 import { Service } from 'typedi';
 import { generateId } from '@/utils/generateId';
 import { BorrowRequestDto, UpdateBorrowRequestDto } from '@/dtos/borrowRequest.dto';
-import { BorrowResponse } from '@/interfaces/borrowRequest';
+import { BookRequestByUserResponse, BorrowRequestDb, BorrowResponse } from '@/interfaces/borrowRequest';
 import { HttpException } from '@/exceptions/httpException';
 
 @Service()
@@ -11,6 +11,40 @@ export class BorrowRequestService {
   public borrow = new PrismaClient().borrowedBook;
   public book = new PrismaClient().book;
   public user = new PrismaClient().user;
+
+  public async findAllBookByUserId(userId: string): Promise<BookRequestByUserResponse[]> {
+    const findUser: User = await this.user.findUnique({ where: { Id: userId } });
+    if (!findUser) throw new HttpException(409, "User doesn't exist");
+
+    const findBorrowRequest: BorrowRequestDb[] = await this.request.findMany({
+      where: { UserId: userId },
+      include: { Book: { include: { Category: true } } },
+    });
+
+    const borrowRequestResponse: BookRequestByUserResponse[] = findBorrowRequest.map((borrowRequest: BorrowRequestDb) => ({
+      id: borrowRequest.Id,
+      userId: borrowRequest.UserId,
+      bookId: borrowRequest.BookId,
+      status: borrowRequest.Status,
+      days: borrowRequest.Days,
+      requestDate: borrowRequest.RequestDate,
+      approvedDate: borrowRequest.Approved,
+      book: {
+        id: borrowRequest.Book.Id,
+        title: borrowRequest.Book.Title,
+        description: borrowRequest.Book.Description,
+        imageUrl: borrowRequest.Book.ImageUrl,
+        releaseYear: borrowRequest.Book.ReleaseYear,
+        price: borrowRequest.Book.Price,
+        totalPage: borrowRequest.Book.TotalPage,
+        thickness: borrowRequest.Book.Thickness,
+        categoryId: borrowRequest.Book.CategoryId,
+        category: borrowRequest.Book.Category.Name,
+      },
+    }));
+
+    return borrowRequestResponse;
+  }
 
   public async createBorrowRequest(borrowRequestData: BorrowRequestDto): Promise<BorrowResponse> {
     const findUser: User = await this.user.findUnique({ where: { Id: borrowRequestData.UserId } });

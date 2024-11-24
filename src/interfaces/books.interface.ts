@@ -1,3 +1,5 @@
+import { Book, BorrowRequest, Category } from '@prisma/client';
+
 export interface BookResponse {
   id: string;
   title: string;
@@ -8,4 +10,11 @@ export interface BookResponse {
   totalPage: number;
   thickness: string;
   categoryId: string;
+  category?: string;
+  request?: boolean;
+}
+
+export interface BookCategoryDb extends Book {
+  Category: Category;
+  BorrowRequest: BorrowRequest[];
 }

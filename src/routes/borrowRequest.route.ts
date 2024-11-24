@@ -22,6 +22,7 @@ export class BorrowRequestRoute implements Routes {
       ValidationMiddleware(BorrowRequestDto),
       this.request.createBorrowRequest,
     );
+    this.router.get(`${this.path}/:id([A-Za-z0-9]+)`, AuthMiddleware([Role.ADMIN, Role.MEMBER]), this.request.findAllBookByUserId);
     this.router.put(
       `${this.path}/:id([A-Za-z0-9]+)`,
       AuthMiddleware([Role.ADMIN]),

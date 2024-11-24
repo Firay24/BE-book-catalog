@@ -1,29 +1,30 @@
-import { PrismaClient, Book } from '@prisma/client';
+import { PrismaClient, Book, RequestStatus } from '@prisma/client';
 import { Service } from 'typedi';
 import { HttpException } from '@/exceptions/httpException';
 import { generateId } from '@/utils/generateId';
-import { BookResponse } from '@/interfaces/books.interface';
+import { BookCategoryDb, BookResponse } from '@/interfaces/books.interface';
 import { UpdateBooksDto } from '@/dtos/books.dto';
 import DetermineThickness from '@/utils/thickness';
-import { title } from 'process';
 
 @Service()
 export class BookService {
   public book = new PrismaClient().book;
 
   public async findAllBook(): Promise<BookResponse[]> {
-    const bookDB: Book[] = await this.book.findMany();
-    const bookData: BookResponse[] = bookDB.map((user: Book) => {
+    const bookDB: BookCategoryDb[] = await this.book.findMany({ include: { Category: true, BorrowRequest: true } });
+    const bookData: BookResponse[] = bookDB.map((item: BookCategoryDb) => {
       return {
-        id: user.Id,
-        title: user.Title,
-        description: user.Description,
-        imageUrl: user.ImageUrl,
-        releaseYear: user.ReleaseYear,
-        price: user.Price,
-        totalPage: user.TotalPage,
-        thickness: user.Thickness,
-        categoryId: user.CategoryId,
+        id: item.Id,
+        title: item.Title,
+        description: item.Description,
+        imageUrl: item.ImageUrl,
+        releaseYear: item.ReleaseYear,
+        price: item.Price,
+        totalPage: item.TotalPage,
+        thickness: item.Thickness,
+        categoryId: item.CategoryId,
+        category: item.Category.Name,
+        request: item.BorrowRequest.some(request => request.Status === RequestStatus.PENDING),
       };
     });
     return bookData;
