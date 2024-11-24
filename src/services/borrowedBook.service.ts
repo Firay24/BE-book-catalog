@@ -2,13 +2,60 @@ import { PrismaClient, StatusBook, User } from '@prisma/client';
 import { Service } from 'typedi';
 import { HttpException } from '@/exceptions/httpException';
 import { UpdateBorrowedBookDto } from '@/dtos/borrowedBook.dto';
-import { BorrowedBookResponse, FindBorrowedBook } from '@/interfaces/borrowedBook.interface';
+import { BookBorrowedDb, BorrowedBookResponse, FindBorrowedBook } from '@/interfaces/borrowedBook.interface';
 
 @Service()
 export class BorrowedBookService {
   public borrow = new PrismaClient().borrowedBook;
   public user = new PrismaClient().user;
   public book = new PrismaClient().book;
+
+  public async getBorrowedBooksByUserId(userId: string): Promise<BorrowedBookResponse[]> {
+    const user = await this.user.findUnique({ where: { Id: userId } });
+    if (!user) {
+      throw new HttpException(404, 'User not found');
+    }
+
+    const borrowedBooks: BookBorrowedDb[] = await this.borrow.findMany({
+      where: {
+        BorrowRequest: {
+          UserId: userId,
+        },
+      },
+      include: {
+        BorrowRequest: true,
+        Book: { include: { Category: true } },
+      },
+    });
+
+    const responseData: BorrowedBookResponse[] = borrowedBooks.map((item: BookBorrowedDb) => ({
+      id: item.Id,
+      borrowRequestId: item.BorrowRequestId,
+      startDate: item.StartDate,
+      endDate: item.EndDate,
+      bookId: item.BookId,
+      returnDate: item.ReturnedDate,
+      Book: {
+        id: item.Book.Id,
+        title: item.Book.Title,
+        description: item.Book.Description,
+        imageUrl: item.Book.ImageUrl,
+        releaseYear: item.Book.ReleaseYear,
+        price: item.Book.Price,
+        totalPage: item.Book.TotalPage,
+        thickness: item.Book.Thickness,
+        status: item.Book.Status,
+        categoryId: item.Book.CategoryId,
+        category: item.Book.Category.Name,
+      },
+    }));
+
+    if (!borrowedBooks.length) {
+      throw new HttpException(404, 'No borrowed books found for this user');
+    }
+
+    return responseData;
+  }
 
   public async updateBorrowedBook(borrowedBookId: string, borrowedRequestData: UpdateBorrowedBookDto): Promise<BorrowedBookResponse> {
     const findBorrowedBook: FindBorrowedBook = await this.borrow.findUnique({ where: { Id: borrowedBookId }, include: { BorrowRequest: true } });

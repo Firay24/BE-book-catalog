@@ -18,4 +18,15 @@ export class BorrowedBookController {
       next(error);
     }
   };
+
+  public getBorrowedBookByUserId = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const userId = String(req.params.id);
+      const bookBorrowedData: BorrowedBookResponse[] = await this.borrow.getBorrowedBooksByUserId(userId);
+
+      res.status(200).json({ data: bookBorrowedData, message: 'find all' });
+    } catch (error) {
+      next(error);
+    }
+  };
 }

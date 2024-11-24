@@ -22,5 +22,6 @@ export class BorrowedBookRoute implements Routes {
       ValidationMiddleware(UpdateBorrowedBookDto, true),
       this.borrow.updateBorrowedBook,
     );
+    this.router.get(`${this.path}/:id([A-Za-z0-9]+)`, AuthMiddleware([Role.ADMIN, Role.MEMBER]), this.borrow.getBorrowedBookByUserId);
   }
 }
