@@ -6,5 +6,5 @@ export interface BorrowResponse {
   bookId: string;
   status: RequestStatus;
   requestDate: Date;
-  approved: Date;
+  approvedDate: Date;
 }

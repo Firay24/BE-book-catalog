@@ -1,4 +1,4 @@
-import { PrismaClient, User } from '@prisma/client';
+import { PrismaClient, StatusBook, User } from '@prisma/client';
 import { Service } from 'typedi';
 import { HttpException } from '@/exceptions/httpException';
 import { UpdateBorrowedBookDto } from '@/dtos/borrowedBook.dto';
@@ -8,6 +8,7 @@ import { BorrowedBookResponse, FindBorrowedBook } from '@/interfaces/borrowedBoo
 export class BorrowedBookService {
   public borrow = new PrismaClient().borrowedBook;
   public user = new PrismaClient().user;
+  public book = new PrismaClient().book;
 
   public async updateBorrowedBook(borrowedBookId: string, borrowedRequestData: UpdateBorrowedBookDto): Promise<BorrowedBookResponse> {
     const findBorrowedBook: FindBorrowedBook = await this.borrow.findUnique({ where: { Id: borrowedBookId }, include: { BorrowRequest: true } });
@@ -17,6 +18,13 @@ export class BorrowedBookService {
       where: { Id: borrowedBookId },
       data: {
         ReturnedDate: borrowedRequestData.ReturnedDate,
+      },
+    });
+
+    await this.book.update({
+      where: { Id: findBorrowedBook.BookId },
+      data: {
+        Status: StatusBook.AVAILABLE,
       },
     });
 

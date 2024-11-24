@@ -1,4 +1,4 @@
-import { PrismaClient, BorrowRequest, RequestStatus, StatusBook, User } from '@prisma/client';
+import { PrismaClient, BorrowRequest, RequestStatus, StatusBook, User, Book } from '@prisma/client';
 import { Service } from 'typedi';
 import { generateId } from '@/utils/generateId';
 import { BorrowRequestDto, UpdateBorrowRequestDto } from '@/dtos/borrowRequest.dto';
@@ -15,8 +15,11 @@ export class BorrowRequestService {
   public async createBorrowRequest(borrowRequestData: BorrowRequestDto): Promise<BorrowResponse> {
     const findUser: User = await this.user.findUnique({ where: { Id: borrowRequestData.UserId } });
     if (!findUser) throw new HttpException(409, "User doesn't exist");
-
     if (findUser.BanUntil > new Date()) throw new HttpException(409, 'User is banned');
+
+    const findBook: Book = await this.book.findUnique({ where: { Id: borrowRequestData.BookId } });
+    if (!findBook) throw new HttpException(409, "Book doesn't exist");
+    if (findBook.Status === StatusBook.BORROWED) throw new HttpException(409, 'Book is borrowed');
 
     const createBorrowRequestData: BorrowRequest = await this.request.create({
       data: {
@@ -34,7 +37,7 @@ export class BorrowRequestService {
       bookId: createBorrowRequestData.BookId,
       status: createBorrowRequestData.Status,
       requestDate: createBorrowRequestData.RequestDate,
-      approved: createBorrowRequestData.Approved,
+      approvedDate: createBorrowRequestData.Approved,
     };
 
     return borrowRequestResponse;
@@ -76,7 +79,7 @@ export class BorrowRequestService {
       bookId: updateRequest.BookId,
       status: updateRequest.Status,
       requestDate: updateRequest.RequestDate,
-      approved: updateRequest.Approved,
+      approvedDate: updateRequest.Approved,
     };
 
     return borrowRequestResponse;
